@@ -25,7 +25,7 @@ files.forEach(function(value, index){
 
 var uniques = { "uniques" : items }
 var file = 'uniques.json'
-jsonfile.writeFile(file, items, function(err) {
+jsonfile.writeFile(file, uniques, function(err) {
 		if(err){
 			console.error(err)	
 		}
