@@ -52,7 +52,7 @@ urls.forEach(function(url, index){
 					var match = InArray(text, statsIWant);
 					if (match) {
 						tempObj = {}
-						tempObj.name = text
+						tempObj.name = match
 						tempObj.index = j
 						columnsToParse[match] = tempObj	
 					}
@@ -183,19 +183,20 @@ urls.forEach(function(url, index){
 
 					// check if value range, we don't want single values
 					if (match) {
+						var q20 = columnsToParse[key].name.match(/q20/gi);
 						if (match[3]){
 							var tempObj = {}
 							tempObj.name   = columnsToParse[key].name;
 							tempObj.ranges = [ 
-								[parseFloat(match[0]), parseFloat(match[1])], 
-								[parseFloat(match[2]), parseFloat(match[3])] 
+								[parseFloat(q20 ? match[0] * 1.2 : match[0]), parseFloat(q20 ? match[1] * 1.2 : match[1])], 
+								[parseFloat(q20 ? match[2] * 1.2 : match[2]), parseFloat(q20 ? match[3] * 1.2 : match[3])] 
 							]
 							stats.push(tempObj);	
 						}
 						else if (match[1]) {
 							var tempObj = {}
 							tempObj.name   = columnsToParse[key].name;
-							tempObj.ranges = [ parseFloat(match[0]), parseFloat(match[1]) ]
+							tempObj.ranges = [ [parseFloat(q20 ? match[0] * 1.2 : match[0]), parseFloat(q20 ? match[1] * 1.2 : match[1])] ]
 							stats.push(tempObj);	
 						}
 					}
@@ -263,10 +264,22 @@ function InArray(value, array) {
 	if (typeof value === "string") {
 		array.forEach(function(el, index){
 			if (value.toLowerCase() == array[index].toLowerCase()) {
-				match = value
+				if(value == "AR") {
+					match = "Armour"
+				} else if (value == "EV") {
+					match = "Evasion Rating" 
+				} else if (value == "ES") {
+					match = "Energy Shield" 
+				} else if (value == "pDPS") {
+					match = "Physical Dps (Q20)" 
+				} else if (value == "eDPS") {
+					match = "Elemental Dps" 
+				} else {
+					match = value
+				}
 			}
 		})
-		return (match) ? value : false
+		return (match) ? match : false
 	}
 	else {
 		array.forEach(function(el, index){
@@ -274,6 +287,6 @@ function InArray(value, array) {
 				match = value
 			}
 		})
-		return (match) ? value : false
+		return (match) ? match : false
 	}	
 }
