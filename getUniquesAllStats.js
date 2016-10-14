@@ -120,7 +120,7 @@ request(options, function (error, response, body) {
 		'body_armours', 'boots', 'gloves', 'helmets', 'shields', 'belts', 'amulets', 'rings', 'flasks', 'jewels'
 	]
 
-	urls = ['body_armours']
+	urls = ['bows']
 
 	console.log('- [ ] Begin scraping \x1b[36mpoe wiki\x1b[0m.');
 	urls.forEach(function(url, index){
@@ -152,12 +152,13 @@ request(options, function (error, response, body) {
 				// find out which columns to parse
 				headers.each(function(j, header){
 					title = $(this).find('abbr').attr('title')
+					text  = $(this).find('abbr').text();
 					if (typeof title !== undefined) {
-						var statsIWant = ['Armour', 'Energy Shield', 'Evasion Rating', 'Damage', 'pDPS', 'eDPS', 'DPS', 'APS']
-						var match = InArray(title, statsIWant);
+						var statsIWant = ['AR', 'ES', 'EV', 'Damage', 'pDps', 'eDps', 'DPS', 'aps']
+						var match = InArray(text, statsIWant);
 						if (match) {
 							tempObj = {}
-							tempObj.name = match
+							tempObj.name = text
 							tempObj.index = j
 							columnsToParse[match] = tempObj	
 						}
@@ -167,9 +168,8 @@ request(options, function (error, response, body) {
 				var rows = $(this).find('tr')				
 				rows.each(function(j, row){
 					var name = $(this).find('td').first().find('a').first().text();
-					var stats = []
-					console.log(name);
-					
+					var stats = [];
+					console.log(name)
 					for (var key in columnsToParse)	{
 						var index = columnsToParse[key].index;
 						var value = $(this).find('td').eq(index).text();
@@ -180,7 +180,13 @@ request(options, function (error, response, body) {
 						
 						// check if value range, we don't want single values
 						if (match) {
-							if (match[1]) {
+							if (match[4]){
+								var tempObj = {}
+								tempObj.name   = columnsToParse[key].name;
+								tempObj.ranges = [ [match[0], match[1]], [ [match[2]], [4] ] ]
+								stats.push(tempObj);
+							}
+							else if (match[1]) {
 								var tempObj = {}
 								tempObj.name   = columnsToParse[key].name;
 								tempObj.ranges = [ match[0], match[1] ]
@@ -188,6 +194,7 @@ request(options, function (error, response, body) {
 							}
 						}
 					}
+					console.log(stats)
 
 					uniques.uniques.forEach(function(el, i){
 						if(el.name == name) {
