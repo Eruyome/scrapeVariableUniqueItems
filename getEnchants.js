@@ -42,6 +42,7 @@ urls.forEach(function(url, index){
 				var modRaw = $(this).find('td').last().text();
  
 				var mod = modRaw.replace(/((\d+(.\d+)?) to (\d+(.\d+)?))|(\d+(.\d+)?)/gi,"#");
+				var mod = modRaw.replace(/([.0-9]+)/gi,"#");
 				//var mod = mod.replace(/Word of|Edict of|Decree of|Commandment of/gi,"# of");
 
 				mods[mod] = mod;
