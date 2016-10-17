@@ -4,16 +4,12 @@ var json2csv = require('json2csv');
 var fs = require('fs');
 var cheerio = require('cheerio');
 
-try {
-	fs.unlinkSync('uniques.json');	
-} catch (err) {}
-
 urls = [
 	'axes', 'bows', 'claws', 'daggers', 'fishing_rods', 'maces', 'staves', 'swords', 'wands', 'quivers', 
 	'body_armours', 'boots', 'gloves', 'helmets', 'shields', 'belts', 'amulets', 'rings', 'flasks', 'jewels'
 ]
 
-//urls = ['bows']
+//urls = ['swords']
 
 console.log('- [ ] Begin scraping \x1b[36mpoe wiki\x1b[0m.');
 urls.forEach(function(url, index){
@@ -77,19 +73,28 @@ urls.forEach(function(url, index){
 
 						var modname = value;
 						var range_regex = /(\(.*?\)).*?(\(.*?\))|(\(.*?\))/gi;
+						//var range_regex = /(\(.*?\)).*?(\(.*?\))|(\d+(\.?\d+)? to )?(\(.*?\))/gi;
 						var match = range_regex.exec(modname);
 						var range = []
 
 						if (match == null) return;									
 						$(match).each(function(l, values){			
-							if(l > 0) {					
+							if(l > 0) {		
 								var values_regex = /(\d+.*) ?(to|-) ?(\d+.*)?/gi;
 								var val_match = values_regex.exec(values);
 								var temp = []
 
+								// matches "1 to" in for example "adds 1 to (20-40) lightning damage" and creates a range
+								// with "1"
+								var reg = /(\d+) to/gi;	
+								var singleValRangeMatch = reg.exec(val_match)	
+								if (singleValRangeMatch) {
+									//console.log('ding');
+								}
+
 								$(val_match).each(function(l, val){
 									if (typeof val !== "undefined" && l > 0 && l != 2) {						
-										val = val.replace(/ |\)/g, "");
+										val = val.replace(/ |\)/g, "");									
 										temp.push(parseFloat(val));	
 									}
 								})	
