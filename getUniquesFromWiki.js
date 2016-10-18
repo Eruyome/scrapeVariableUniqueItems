@@ -72,7 +72,7 @@ urls.forEach(function(url, index){
 						value = value.replace(/(<.*?>)/g, "");
 
 						var modname = value;
-						var range_regex = /(\(.*?\)).*?(\(.*?\))|(\(.*?\))/gi;
+						var range_regex = /(\([-+.0-9]+?\)).*?(\([-+.0-9]+?\))|(\([-+.0-9]+?\))/gi;
 						//var range_regex = /(\(.*?\)).*?(\(.*?\))|(\d+(\.?\d+)? to )?(\(.*?\))/gi;
 						var match = range_regex.exec(modname);
 						var range = []
@@ -102,8 +102,8 @@ urls.forEach(function(url, index){
 							}
 						})
 
-						var mod = {}
-						modname = modname.replace(/(\(.*?\)).*?(\(.*?\))|(\(.*?\))/g, "#");				
+						var mod = {}																																																																														
+						modname = modname.replace(/(\([-+.0-9]+?\)).*?(\([-+.0-9]+?\))|(\([-+.0-9]+?\))/g, "#");				
 						mod.name =  modname.replace(/# %/g, "#%");
 						mod.ranges = range; 
 						tempObj.mods.push(mod);	
