@@ -9,7 +9,7 @@ urls = [
 	'body_armours', 'boots', 'gloves', 'helmets', 'shields', 'belts', 'amulets', 'rings', 'flasks', 'jewels'
 ]
 
-//urls = ['swords']
+//urls = ['maces']
 
 console.log('- [ ] Begin scraping \x1b[36mpoe wiki\x1b[0m.');
 urls.forEach(function(url, index){
@@ -73,40 +73,60 @@ urls.forEach(function(url, index){
 
 						var modname = value;
 						var range_regex = /(\([-+.0-9]+?\)).*?(\([-+.0-9]+?\))|(\([-+.0-9]+?\))/gi;
-						//var range_regex = /(\(.*?\)).*?(\(.*?\))|(\d+(\.?\d+)? to )?(\(.*?\))/gi;
 						var match = range_regex.exec(modname);
 						var range = []
 
-						if (match == null) return;									
-						$(match).each(function(l, values){			
-							if(l > 0) {		
-								var values_regex = /(\d+.*) ?(to|-) ?(\d+.*)?/gi;
-								var val_match = values_regex.exec(values);
-								var temp = []
 
-								// matches "1 to" in for example "adds 1 to (20-40) lightning damage" and creates a range
-								// with "1"
-								var reg = /(\d+) to/gi;	
-								var singleValRangeMatch = reg.exec(val_match)	
-								if (singleValRangeMatch) {
-									//console.log('ding');
+						// mods with variable rolls
+						if (match) {								
+							$(match).each(function(l, values){			
+								if(l > 0) {		
+									var values_regex = /(\d+.*) ?(to|-) ?(\d+.*)?/gi;
+									var val_match = values_regex.exec(values);
+									var temp = []
+
+									$(val_match).each(function(l, val){
+										if (typeof val !== "undefined" && l > 0 && l != 2) {						
+											val = val.replace(/ |\)/g, "");									
+											temp.push(parseFloat(val));	
+										}
+									})	
+									if(temp.length > 0) range.push(temp);
 								}
+							})
 
-								$(val_match).each(function(l, val){
-									if (typeof val !== "undefined" && l > 0 && l != 2) {						
-										val = val.replace(/ |\)/g, "");									
-										temp.push(parseFloat(val));	
-									}
-								})	
-								if(temp.length > 0) range.push(temp);
-							}
-						})
+							var mod = {}												
+							modname = modname.replace(/&apos;/gi, "'");
+							mod.name_orig = modname																																																																													
+							modname = modname.replace(/(\([-+.0-9]+?\)).*?(\([-+.0-9]+?\))|(\([-+.0-9]+?\))/g, "#");
+							mod.name = modname.replace(/# %/g, "#%");
+							mod.ranges = range; 
+							mod.isVariable = true;
+							tempObj.mods.push(mod);	
+						}
 
-						var mod = {}																																																																														
-						modname = modname.replace(/(\([-+.0-9]+?\)).*?(\([-+.0-9]+?\))|(\([-+.0-9]+?\))/g, "#");				
-						mod.name =  modname.replace(/# %/g, "#%");
-						mod.ranges = range; 
-						tempObj.mods.push(mod);	
+						// mods with static values
+						else {
+							var hidden_regex = /\(hidden\)/gi;
+							var match = hidden_regex.exec(modname);
+							if(match) return
+
+							var values_regex = /([-.0-9]+)/gi;
+							var match = values_regex.exec(modname);
+							var valuesArr = []
+
+							valuesArr = modname.matchAll(values_regex);							
+							
+							var mod = {}								
+							modname = modname.replace(/&apos;/gi, "'");										
+							mod.name_orig = modname																																																																																																																																																
+							modname = modname.replace(/([-.0-9]+) to ([-.0-9]+)/g, "#");								
+							modname = modname.replace(/([.0-9]+)/g, "#");
+							mod.name = modname.replace(/# %/g, "#%");
+							mod.values = (valuesArr) ? valuesArr : temp = [];
+							mod.isVariable = false;
+							tempObj.mods.push(mod);							
+						}
 					})	
 
 					// make sure not to push the same item more than once (atziris splendour)
@@ -120,7 +140,8 @@ urls.forEach(function(url, index){
 								item.mods.forEach(function(mod, j){
 									var found = false;
 									if(typeof item.mods !== 'undefined') {
-										value.mods.forEach(function(elmod,k){		
+										value.mods.forEach(function(elmod,k){	
+											if(typeof value.mods[k].ranges === "undefined")	{return;}
 											if(elmod.name == mod.name){
 												found = true;										
 												if (value.mods[k].ranges[0] > mod.ranges[0]){
@@ -296,3 +317,13 @@ function InArray(value, array) {
 		return (match) ? match : false
 	}	
 }
+
+String.prototype.matchAll = function(regexp) {
+  var matches = [];
+  this.replace(regexp, function() {
+    var arr = ([]).slice.call(arguments, 0);
+    var extras = arr.splice(-3);
+    matches.push(parseFloat(arr[0]));
+  });
+  return matches.length ? matches : null;
+};
