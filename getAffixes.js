@@ -31,7 +31,11 @@ urls.forEach(function(url, index){
 
 	console.log('- [ ] Scraping \x1b[35m'+ urls[index] +'\x1b[0m.');
 	request(options, function (error, response, body) {
-		if (error) throw new Error(error);
+		if (error) {			
+			console.log('Error on: ' + urls[index]);
+			//throw new Error(error);
+			return
+		}
 		
 		console.log('- [x] Scraped \x1b[35m'+ urls[index] +'\x1b[0m.');
 		console.log('    - [ ] Begin parsing \x1b[31m'+ urls[index] +'\x1b[0m.');
@@ -42,17 +46,29 @@ urls.forEach(function(url, index){
 
 
 		
-		var modsRaw = $('span.-mod');
+		var modsRaw = $('em').filter('.-mod');
 		affixes = [];
 
 		modsRaw.each(function(i, mod){
 			mod = $(mod).text();
-			pos = mod.indexOf("Mod group:")
+			pos = mod.indexOf("Mod group:");
 			if (pos < 0) {
 				mod = mod.replace(/(<.*?>)/g, "");
 				mod = mod.replace(/(\([-.0-9]+\)( to )?\([-.0-9]+\))|\([-.0-9]+\)|([-.0-9]+)/g, "#");
-				if(!InArray(mod, affixes)) {
-					affixes.push(mod);
+				pos2 = mod.indexOf(",");
+
+				if (pos2 > 0) {
+					arr = mod.split(",");
+					arr.forEach(function(m, j){
+						if(!InArray(m, affixes)) {
+							affixes.push(m);
+						}
+					})
+				}				
+				else {					
+					if(!InArray(mod, affixes)) {
+						affixes.push(mod);
+					}	
 				}
 			}
 

@@ -18,7 +18,9 @@ files.forEach(function(value, index){
 	if (isJSON) {
 		temp = jsonfile.readFileSync(dir+value)
 		temp.affixes.forEach(function(mod,j){
-			mods.push(mod)
+			if (!InArray(mod, mods)){
+				mods.push(mod)
+			}
 		})
 	}
 })
@@ -34,3 +36,22 @@ jsonfile.writeFile(file, affixes, function(err) {
 	}
 })	
 
+function InArray(value, array) {
+	var match
+	if (typeof value === "string") {
+		array.forEach(function(el, index){
+			if (value.toLowerCase() == array[index].toLowerCase()) {
+				match = value
+			}
+		})
+		return (match) ? match : false
+	}
+	else {
+		array.forEach(function(el, index){
+			if (value == array[index]) {
+				match = value
+			}
+		})
+		return (match) ? match : false
+	}	
+}
