@@ -38,7 +38,7 @@ request(options, function (error, response, body) {
 	});
 	
 	var mods = { "mods" : groups }
-	var file = 'mods.json'
+	var file = 'poeTradeMods.json'
   	jsonfile.writeFile(file, mods, function(err) {
   		if(err){
   			console.error(err)	

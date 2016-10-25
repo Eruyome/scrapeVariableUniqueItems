@@ -8,10 +8,10 @@ urls = [
 	'one-handed_axe_', 'two-handed_axe_', 'claw_', 'dagger_', 'sceptre_', 'wand_', 'one-handed_sword_', 'two-handed_sword_', 'one-handed_mace_', 'two-handed_mace_', 
 	'bow_', 'fishing_rod_', 'amulet_', 'belt_', 'ring_', 'quiver_', 'life_flask_', 'mana_flask_', 'hybrid_flask_', 'utility_flask_', 'critical_utility_flask_', 
 	'int_body_armour_', 'str_body_armour_', 'dex_body_armour_', 'str_dex_body_armour_', 'str_int_body_armour_', 'dex_int_body_armour_',	'str_dex_int_body_armour_',
-	'int_boot_', 'str_boot_', 'dex_boot_', 'str_dex_boot_', 'str_int_boot_', 'dex_int_boot_', 'str_dex_int_boot_',
-	'int_glove_', 'str_glove_', 'dex_glove_', 'str_dex_glove_', 'str_int_glove_', 'dex_int_glove_', 'str_dex_int_glove_',
-	'int_helmet_', 'str_helmet_', 'dex_helmet_', 'str_dex_helmet_', 'str_int_helmet_', 'dex_int_helmet_', 'str_dex_int_helmet_',
-	'int_shield_', 'str_shield_', 'dex_shield_', 'str_dex_shield_', 'str_int_shield_', 'dex_int_shield_', 'str_dex_int_shield_',
+	'int_boot_', 'str_boot_', 'dex_boot_', 'str_dex_boot_', 'str_int_boot_', 'dex_int_boot_', 
+	'int_glove_', 'str_glove_', 'dex_glove_', 'str_dex_glove_', 'str_int_glove_', 'dex_int_glove_', 
+	'int_helmet_', 'str_helmet_', 'dex_helmet_', 'str_dex_helmet_', 'str_int_helmet_', 'dex_int_helmet_', 
+	'int_shield_', 'str_shield_', 'dex_shield_', 'str_dex_shield_', 'str_int_shield_', 'dex_int_shield_', 
 	'cobalt_jewel_', 'crimson_jewel_', 'viridian_jewel_', 'prismatic_jewel_'
 ]
 
@@ -46,7 +46,7 @@ urls.forEach(function(url, index){
 
 
 		
-		var modsRaw = $('em').filter('.-mod');
+		var modsRaw = $('th > em').filter('.-mod');
 		affixes = [];
 
 		modsRaw.each(function(i, mod){
@@ -54,20 +54,39 @@ urls.forEach(function(url, index){
 			pos = mod.indexOf("Mod group:");
 			if (pos < 0) {
 				mod = mod.replace(/(<.*?>)/g, "");
+				//mod = mod.replace(/(\(-\d+--\d+\))/g, "-#");
 				mod = mod.replace(/(\([-.0-9]+\)( to )?\([-.0-9]+\))|\([-.0-9]+\)|([-.0-9]+)/g, "#");
+				mod = mod.replace(/(\(#+\))/g, "-#");
 				pos2 = mod.indexOf(",");
 
 				if (pos2 > 0) {
 					arr = mod.split(",");
+					// split mods only when every part has an own value
+					// example: #% chance to freeze, #% increased freeze duration
+					tempArr = []
 					arr.forEach(function(m, j){
+						number = m.indexOf("#");
+						if(number > -1) {
+							tempArr.push(m)
+						}
+						else if (j == 0) {
+							tempArr.push(m)	
+						}
+						else {
+							l = tempArr.length - 1
+							tempArr[l] = tempArr[l] + "," + m
+						}
+					})
+
+					tempArr.forEach(function(m, j){
 						if(!InArray(m, affixes)) {
-							affixes.push(m);
+							affixes.push(m.trim());
 						}
 					})
 				}				
 				else {					
 					if(!InArray(mod, affixes)) {
-						affixes.push(mod);
+						affixes.push(mod.trim());
 					}	
 				}
 			}

@@ -25,6 +25,7 @@ files.forEach(function(value, index){
 	}
 })
 
+mods.sort()
 var affixes = { "affixes" : mods }
 var file = 'affixes.json'
 jsonfile.writeFile(file, affixes, function(err) {
