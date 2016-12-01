@@ -26,7 +26,6 @@ request(options, function (error, response, body) {
 	
 	var select = $('select[name=mod_name]').first();
 	var optgroups = $(select).find('optgroup');
-	console.log(optgroups.length)
 	var groups = {}
 	
 	optgroups.each(function(index, el){

@@ -1,0 +1,1 @@
+use "_getAllData.bat" to scrape all unique items, mods, echantments and poe.trade mods

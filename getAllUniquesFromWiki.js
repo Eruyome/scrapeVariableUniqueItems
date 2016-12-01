@@ -279,7 +279,8 @@ urls.forEach(function(url, index){
 			else {						
 				console.log('- [x] \x1b[32m'+urls[index]+'.json\x1b[0m saved.');
 			}
-		})		
+		})
+		
 		
 	})		
 })	
