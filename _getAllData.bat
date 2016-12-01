@@ -19,5 +19,3 @@ node getCorruptedMods.js
 :: scrape corrupted mods.
 echo Scraping enchantments.
 node getEnchants.js
-
-pause
